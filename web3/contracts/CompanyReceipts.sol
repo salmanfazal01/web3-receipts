@@ -14,7 +14,6 @@ contract CompanyReceipts {
         uint256 approvalDate; // Date the company was approved
         address approvedBy; // Address of the admin who approved the company
         uint256 totalSales; // Total sales for the company
-        mapping(uint256 => uint256) monthlySales; // Mapping from month to total sales for that month
     }
 
     // Struct representing a receipt
@@ -29,6 +28,7 @@ contract CompanyReceipts {
 
     // Struct representing an admin
     struct Admin {
+        address adminId;
         bool isAdmin;
         bool isSuperAdmin;
     }
@@ -45,6 +45,9 @@ contract CompanyReceipts {
 
     // Track for total admins
     address[] private adminKeys;
+
+    // Track for unapproved companies
+    address[] private unapprovedCompanies;
 
     // Counter for receipt IDs
     uint256 private receiptCounter;
@@ -65,7 +68,7 @@ contract CompanyReceipts {
         uint256 indexed receiptId,
         uint256 indexed date
     );
-    event AdminAdded(address indexed adminId);
+    event AdminAdded(address indexed adminId, bool indexed isSuperAdmin);
     event AdminRemoved(address indexed adminId);
 
     // --- MODIFIERS ---
@@ -121,6 +124,8 @@ contract CompanyReceipts {
         company.companyName = _companyName;
         company.companyAddress = _companyAddress;
 
+        unapprovedCompanies.push(msg.sender);
+
         emit CompanyRegistration(msg.sender, _companyName, block.timestamp);
 
         return msg.sender;
@@ -138,6 +143,16 @@ contract CompanyReceipts {
         company.approvalDate = block.timestamp;
         company.approvedBy = msg.sender;
 
+        for (uint256 i = 0; i < unapprovedCompanies.length; i++) {
+            if (unapprovedCompanies[i] == _companyId) {
+                unapprovedCompanies[i] = unapprovedCompanies[
+                    unapprovedCompanies.length - 1
+                ];
+                unapprovedCompanies.pop();
+                break;
+            }
+        }
+
         emit CompanyApproved(_companyId, msg.sender, block.timestamp);
 
         return true;
@@ -145,28 +160,23 @@ contract CompanyReceipts {
 
     function getCompany(
         address _companyId
-    )
-        public
-        view
-        returns (
-            bool approved,
-            uint256 approvalDate,
-            address approvedBy,
-            address companyId,
-            string memory companyName,
-            string memory companyAddress,
-            uint256 totalSales
-        )
-    {
+    ) public view returns (Company memory) {
         Company storage company = companies[_companyId];
 
-        approved = company.approved;
-        approvalDate = company.approvalDate;
-        approvedBy = company.approvedBy;
-        totalSales = company.totalSales;
-        companyId = company.owner;
-        companyName = company.companyName;
-        companyAddress = company.companyAddress;
+        return company;
+    }
+
+    // Returns all admins
+    function getUnapprovedCompanies() public view returns (Company[] memory) {
+        Company[] memory result = new Company[](unapprovedCompanies.length);
+
+        uint256 index = 0;
+        for (uint256 i = 0; i < unapprovedCompanies.length; i++) {
+            result[index] = companies[unapprovedCompanies[i]];
+            index++;
+        }
+
+        return result;
     }
 
     // RECEIPT FUNCTIONS
@@ -204,7 +214,6 @@ contract CompanyReceipts {
 
         // Update the company's sales
         company.totalSales += _saleAmount;
-        company.monthlySales[getMonth(block.timestamp)] += _saleAmount;
 
         emit ReceiptIssued(msg.sender, receiptId, block.timestamp);
 
@@ -227,14 +236,6 @@ contract CompanyReceipts {
         return companies[_company].totalSales;
     }
 
-    // Function to get total sales for a company in a given month
-    function getMonthSales(
-        address _company,
-        uint256 _month
-    ) public view returns (uint256) {
-        return companies[_company].monthlySales[_month];
-    }
-
     // ADMIN FUNCTIONS
     // Function to add a new admin
     function addAdmin(
@@ -243,12 +244,13 @@ contract CompanyReceipts {
     ) public onlySuperadmin returns (address) {
         require(!admins[_address].isAdmin, "Admin already exist");
 
+        admins[_address].adminId = _address;
         admins[_address].isSuperAdmin = _isSuperAdmin;
         admins[_address].isAdmin = true;
 
         adminKeys.push(_address);
 
-        emit AdminAdded(_address);
+        emit AdminAdded(_address, _isSuperAdmin);
 
         return _address;
     }
@@ -276,13 +278,13 @@ contract CompanyReceipts {
     }
 
     // Returns all admins
-    function getAdmins() public view returns (address[] memory) {
-        address[] memory result = new address[](adminKeys.length);
+    function getAdmins() public view returns (Admin[] memory) {
+        Admin[] memory result = new Admin[](adminKeys.length);
 
         uint256 index = 0;
         for (uint256 i = 0; i < adminKeys.length; i++) {
             if (admins[adminKeys[i]].isAdmin) {
-                result[index] = adminKeys[i];
+                result[index] = admins[adminKeys[i]];
                 index++;
             }
         }

@@ -1,61 +1,52 @@
-import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import GlassPaper from "../components/GlassPaper";
-import { useStateContext } from "../context";
-import { addAdmin, getAdmins, removeAdmin } from "../utils/contract";
-import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { Box, Grid } from "@mui/material";
+import React, { useState } from "react";
+import FormDialog from "../components/FormDialog";
+import NewAdminForm from "../components/forms/NewAdminForm";
+import Title from "../components/Title";
+import AllAdmins from "../page-components/AllAdmins";
+import MoreStats from "../page-components/Demo/MoreStats";
+import StatCards from "../page-components/Demo/StatCards";
+import UnapprovedCompanies from "../page-components/UnapprovedCompanies";
 
 const Admins = () => {
-  const [admins, setAdmins] = useState([]);
-  const { address, connect, contract } = useStateContext();
+  const [formDrawerOpen, setFormDrawerOpen] = useState(false);
 
-  useEffect(() => {
-    const myFunction = async () => {
-      const result = await getAdmins(contract);
-      setAdmins(result || []);
-    };
-
-    myFunction();
-  }, []);
-
-  console.log(admins);
+  const closeFormDrawer = () => {
+    setFormDrawerOpen(false);
+  };
 
   return (
-    <GlassPaper sx={{ height: "100%" }}>
-      <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
-        <Typography variant="h5" sx={{ flex: 1 }}>
-          View Admins
-        </Typography>
+    <Box sx={{ height: "100%" }}>
+      <Title variant={{ xs: "h4", md: "h3" }} sx={{ mb: 3 }}>
+        Good morning, Admin!
+      </Title>
 
-        <Tooltip title="Add new Admin">
-          <IconButton
-            disabled={!address}
-            onClick={() => addAdmin(contract, "")}
-          >
-            <PersonAddIcon />
-          </IconButton>
-        </Tooltip>
-      </Stack>
+      <Box sx={{ mb: 5 }}>
+        <StatCards />
+      </Box>
 
-      {admins.map((item) => (
-        <GlassPaper key={item} sx={{ py: 2 }}>
-          <Stack direction="row" alignItems="center">
-            <Typography sx={{ flex: 1 }}>{item}</Typography>
+      <Box sx={{ mb: 5 }}>
+        <MoreStats />
+      </Box>
 
-            <Tooltip title="Remove Admin">
-              <IconButton
-                disabled={!address}
-                color="error"
-                onClick={() => removeAdmin(contract, item)}
-              >
-                <PersonRemoveIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        </GlassPaper>
-      ))}
-    </GlassPaper>
+      <Grid container spacing={5}>
+        <Grid item xs={12} md={6}>
+          <AllAdmins />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <UnapprovedCompanies />
+        </Grid>
+      </Grid>
+
+      <FormDialog
+        open={formDrawerOpen}
+        handleClose={closeFormDrawer}
+        title="Add a new admin"
+      >
+        <NewAdminForm handleClose={closeFormDrawer} />
+      </FormDialog>
+    </Box>
   );
 };
 

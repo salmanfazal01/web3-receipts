@@ -1,4 +1,3 @@
-import MainBg from "../assets/images/main-bg.png";
-import Logo from "../assets/images/logo.png";
+import MainBg from "../assets/images/main-bg.jpg";
 
-export { MainBg, Logo };
+export { MainBg };

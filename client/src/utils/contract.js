@@ -13,10 +13,55 @@ export const approveCompany = async (contract, _id) => {
   return result;
 };
 
-export const getCompany = async (contract, _id) => {
-  const result = await contract.call("getCompany", _id);
-  console.log("getCompany", result);
-  return result;
+export const getUnapprovedCompanies = async (contract, callback) => {
+  try {
+    const _result = await contract.call("getUnapprovedCompanies");
+
+    const result = _result.map((item) => ({
+      companyId: item.owner,
+      companyName: item.companyName,
+      companyAddress: item.companyAddress,
+      approved: item.approved,
+      approvedBy: item.approvedBy,
+      approvalDate: item.approvalDate,
+      totalSales: item.totalSales,
+    }));
+
+    callback?.(result);
+
+    return result;
+  } catch (error) {
+    console.log("Error in getUnapprovedCompanies:", error);
+    throw error;
+  }
+};
+
+export const getCompany = async (contract, _id, callback) => {
+  try {
+    const result = await contract.call("getCompany", _id);
+
+    const obj = {
+      companyId: result.owner,
+      companyName: result.companyName,
+      companyAddress: result.companyAddress,
+      approved: result.approved,
+      approvedBy: result.approvedBy,
+      approvalDate: result.approvalDate,
+      totalSales: result.totalSales,
+      notCreated:
+        result.owner === "0x0000000000000000000000000000000000000000" ||
+        !result.owner,
+    };
+
+    console.log("getCompany", obj);
+
+    callback?.(obj);
+
+    return obj;
+  } catch (error) {
+    console.log("Error in getCompany:", error);
+    throw error;
+  }
 };
 
 // Receipts
@@ -63,26 +108,43 @@ export const getTotalSales = async (contract, _companyId) => {
 };
 
 // Admin
-export const getAdmins = async (contract) => {
-  const result = await contract.call("getAdmins");
-  console.log("getAdmin", result);
-  return result;
+export const getAdmins = async (contract, callback) => {
+  try {
+    const _result = await contract.call("getAdmins");
+
+    const result = _result.map((item) => ({
+      adminId: item.adminId,
+      isAdmin: item.isAdmin,
+      isSuperAdmin: item.isSuperAdmin,
+    }));
+
+    callback?.(result || []);
+
+    return result;
+  } catch (error) {
+    console.log("Error in getAdmins:", error);
+    return error;
+  }
 };
 
-export const getSuperAdmins = async (contract) => {
-  const result = await contract.call("getSuperAdmins");
-  console.log("getSuperAdmins", result);
-  return result;
-};
-
-export const addAdmin = async (contract, _id) => {
-  const result = await contract.call("grantAdminRole", _id);
-  console.log("addAdmin", result);
-  return result;
+export const addAdmin = async (contract, _id, _isSuperAdmin) => {
+  try {
+    const result = await contract.call("addAdmin", _id, _isSuperAdmin);
+    console.log("addAdmin", result);
+    return result;
+  } catch (error) {
+    console.log("Error in addAdmin:", error);
+    throw error;
+  }
 };
 
 export const removeAdmin = async (contract, _id) => {
-  const result = await contract.call("revokeAdminRole", _id);
-  console.log("removeAdmin", result);
-  return result;
+  try {
+    const result = await contract.call("removeAdmin", _id);
+    console.log("removeAdmin", result);
+    return result;
+  } catch (error) {
+    console.log("Error in removeAdmin:", error);
+    throw error;
+  }
 };

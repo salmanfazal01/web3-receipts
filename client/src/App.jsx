@@ -1,35 +1,36 @@
-import { Box } from "@mui/material";
+import { Box, Hidden } from "@mui/material";
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import Sidebar, { drawerWidth } from "./components/Sidebar";
-import Home from "./pages/Home";
+import { Route, Routes } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import ProfileSegment from "./page-components/ProfileSegment";
 import Admins from "./pages/Admins";
-import { MainBg } from "./utils/images";
+import Company from "./pages/Company";
+import Home from "./pages/Home";
 
 const App = () => {
   return (
-    <Box
-      sx={{
-        background: `url(${MainBg})`,
-        minHeight: "100vh",
-        backgroundSize: "cover",
-        display: "flex",
-      }}
-    >
+    <Box sx={{ position: "relative", display: "flex", minHeight: "100vh" }}>
       <Sidebar />
 
       <Box
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-        }}
+        sx={(theme) => ({
+          flex: 1,
+          py: 3,
+          px: 2,
+          mr: { lg: "300px", xl: "400px" },
+          // width: `calc(100% - 400px)`,
+        })}
       >
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/admins" element={<Admins />} />
+          <Route path="/company" element={<Company />} />
         </Routes>
       </Box>
+
+      <Hidden lgDown>
+        <ProfileSegment />
+      </Hidden>
     </Box>
   );
 };
