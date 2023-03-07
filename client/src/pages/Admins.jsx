@@ -1,19 +1,30 @@
+import BusinessIcon from "@mui/icons-material/Business";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import { Box, Grid } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormDialog from "../components/FormDialog";
 import NewAdminForm from "../components/forms/NewAdminForm";
+import StatCard from "../components/StatCard";
 import Title from "../components/Title";
+import { useStateContext } from "../context";
 import AllAdmins from "../page-components/AllAdmins";
-import MoreStats from "../page-components/Demo/MoreStats";
-import StatCards from "../page-components/Demo/StatCards";
 import UnapprovedCompanies from "../page-components/UnapprovedCompanies";
+import { getAdminStats } from "../utils/contract";
 
 const Admins = () => {
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
 
+  const { contract, address, adminStats, setAdminStats } = useStateContext();
+
   const closeFormDrawer = () => {
     setFormDrawerOpen(false);
   };
+
+  useEffect(() => {
+    getAdminStats(contract, setAdminStats);
+  }, []);
 
   return (
     <Box sx={{ height: "100%" }}>
@@ -21,17 +32,48 @@ const Admins = () => {
         Good morning, Admin!
       </Title>
 
-      <Box sx={{ mb: 5 }}>
-        <StatCards />
-      </Box>
+      <Grid
+        container
+        justifyContent="space-between"
+        spacing={{ xs: 3, xl: 5 }}
+        sx={{ mb: 5 }}
+      >
+        <Grid item xs={6} md={3}>
+          <StatCard
+            Icon={BusinessIcon}
+            title={adminStats.totalCompanies}
+            subtitle="Total Companies"
+          />
+        </Grid>
 
-      <Box sx={{ mb: 5 }}>
-        <MoreStats />
-      </Box>
+        <Grid item xs={6} md={3}>
+          <StatCard
+            Icon={ReceiptIcon}
+            title={adminStats.totalReceipts}
+            subtitle="Total Receipts"
+          />
+        </Grid>
+
+        <Grid item xs={6} md={3}>
+          <StatCard
+            Icon={SupervisorAccountIcon}
+            title={adminStats.totalAdmins}
+            subtitle="Total Admins"
+          />
+        </Grid>
+
+        <Grid item xs={6} md={3}>
+          <StatCard
+            Icon={MonetizationOnIcon}
+            title={adminStats.totalSales}
+            subtitle="Total Sales"
+          />
+        </Grid>
+      </Grid>
 
       <Grid container spacing={5}>
         <Grid item xs={12} md={6}>
-          <AllAdmins />
+          <AllAdmins setFormDrawerOpen={setFormDrawerOpen} />
         </Grid>
 
         <Grid item xs={12} md={6}>

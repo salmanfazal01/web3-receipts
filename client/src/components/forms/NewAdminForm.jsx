@@ -7,26 +7,28 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { useStateContext } from "../../context";
-import { getAdmins } from "../../utils/contract";
+import { getAdmins, getAdminStats } from "../../utils/contract";
 
 const NewAdminForm = ({ handleClose }) => {
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState("");
   const [superAdmin, setSuperAdmin] = useState(false);
-  const { contract, setLoadingPopup, setAdmins } = useStateContext();
+  const { contract, setLoadingPopup, setAdmins, setAdminStats } =
+    useStateContext();
 
   const submitForm = async (e) => {
     e.preventDefault();
 
     setLoadingPopup({
       title: "Sign transaction",
-      message: "Please, sign transaction in your wallet",
+      message: "Please sign transaction in your wallet",
     });
     setLoading(true);
 
     await addAdmin(contract, id, superAdmin)
       .then(async (res) => {
         await getAdmins(contract, setAdmins);
+        await getAdminStats(contract, setAdminStats);
       })
       .then(() => {
         setLoadingPopup(null);

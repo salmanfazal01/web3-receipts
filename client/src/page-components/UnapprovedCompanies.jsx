@@ -3,20 +3,28 @@ import React, { useEffect, useState } from "react";
 import CustomPaper from "../components/CustomPaper";
 import Title from "../components/Title";
 import AddTaskIcon from "@mui/icons-material/AddTask";
-import { approveCompany, getUnapprovedCompanies } from "../utils/contract";
+import {
+  approveCompany,
+  getAdminStats,
+  getUnapprovedCompanies,
+} from "../utils/contract";
 import { useStateContext } from "../context";
 import { smallerString } from "../utils/helper";
 
 const UnapprovedCompanies = () => {
-  const { contract, admins, setAdmins, address, setLoadingPopup } =
-    useStateContext();
+  const {
+    contract,
+    admins,
+    setAdmins,
+    address,
+    setLoadingPopup,
+    setAdminStats,
+  } = useStateContext();
 
   const [companies, setCompanies] = useState([]);
 
   const _get = async () => {
     const result = await getUnapprovedCompanies(contract);
-
-    console.log(result);
 
     setCompanies(result);
   };
@@ -28,12 +36,13 @@ const UnapprovedCompanies = () => {
   const handleApprove = async (id) => {
     setLoadingPopup({
       title: "Sign transaction",
-      message: "Please, sign transaction in your wallet",
+      message: "Please sign transaction in your wallet",
     });
 
     await approveCompany(contract, id)
       .then(async (res) => {
         await _get();
+        await getAdminStats(contract, setAdminStats);
       })
       .then(() => {
         setLoadingPopup(null);

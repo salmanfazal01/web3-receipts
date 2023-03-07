@@ -9,3 +9,7 @@ export const smallerString = (
 
   return `${_first}${Array(numOfDots).join(".")}${_last}`;
 };
+
+export const isAddressNull = (address) => {
+  return address === "0x0000000000000000000000000000000000000000" || !address;
+};

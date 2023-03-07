@@ -14,11 +14,12 @@ contract CompanyReceipts {
         uint256 approvalDate; // Date the company was approved
         address approvedBy; // Address of the admin who approved the company
         uint256 totalSales; // Total sales for the company
+        uint256[] receiptIds; // Ids of receipts
     }
 
     // Struct representing a receipt
     struct Receipt {
-        address company; // Address of the company that issued the receipt
+        address companyId; // Address of the company that issued the receipt
         uint256 saleDate; // Sale date for the receipt
         string[] itemNames; // Name of the items
         uint256[] itemPrices; // Price of the items
@@ -51,6 +52,12 @@ contract CompanyReceipts {
 
     // Counter for receipt IDs
     uint256 private receiptCounter;
+
+    // Counter for total companies
+    uint256 private companiesCounter;
+
+    // Counter for total sales
+    uint256 private totalSales;
 
     // --- EVENTS ---
     event CompanyRegistration(
@@ -153,6 +160,8 @@ contract CompanyReceipts {
             }
         }
 
+        companiesCounter++;
+
         emit CompanyApproved(_companyId, msg.sender, block.timestamp);
 
         return true;
@@ -170,10 +179,8 @@ contract CompanyReceipts {
     function getUnapprovedCompanies() public view returns (Company[] memory) {
         Company[] memory result = new Company[](unapprovedCompanies.length);
 
-        uint256 index = 0;
         for (uint256 i = 0; i < unapprovedCompanies.length; i++) {
-            result[index] = companies[unapprovedCompanies[i]];
-            index++;
+            result[i] = companies[unapprovedCompanies[i]];
         }
 
         return result;
@@ -183,8 +190,8 @@ contract CompanyReceipts {
     // Function for a company to issue a receipt
     function issueReceipt(
         string[] memory _names,
-        uint256[] memory _prices,
-        uint256[] memory _quantities
+        fixed256x18[] memory _prices,
+        fixed256x18[] memory _quantities
     ) public returns (Receipt memory, string memory companyName) {
         Company storage company = companies[msg.sender];
 
@@ -205,7 +212,7 @@ contract CompanyReceipts {
         uint256 receiptId = ++receiptCounter;
         Receipt storage receipt = receipts[receiptId];
 
-        receipt.company = msg.sender;
+        receipt.companyId = msg.sender;
         receipt.saleDate = block.timestamp;
         receipt.itemNames = _names;
         receipt.itemPrices = _prices;
@@ -214,6 +221,9 @@ contract CompanyReceipts {
 
         // Update the company's sales
         company.totalSales += _saleAmount;
+        company.receiptIds.push(receiptId);
+
+        totalSales += _saleAmount;
 
         emit ReceiptIssued(msg.sender, receiptId, block.timestamp);
 
@@ -225,9 +235,25 @@ contract CompanyReceipts {
         uint256 _receiptId
     ) public view returns (Receipt memory, string memory companyName) {
         Receipt storage receipt = receipts[_receiptId];
-        Company storage company = companies[receipt.company];
+        Company storage company = companies[receipt.companyId];
 
         return (receipt, company.companyName);
+    }
+
+    // Function to get all receipts of a company
+    function getCompanyReceipts(
+        address companyId
+    ) public view returns (Receipt[] memory) {
+        Company storage company = companies[companyId];
+
+        Receipt[] memory result = new Receipt[](company.receiptIds.length);
+
+        for (uint256 i = 0; i < company.receiptIds.length; i++) {
+            Receipt storage receipt = receipts[company.receiptIds[i]];
+            result[i] = receipt;
+        }
+
+        return result;
     }
 
     // SALES FUNCTIONS
@@ -281,15 +307,32 @@ contract CompanyReceipts {
     function getAdmins() public view returns (Admin[] memory) {
         Admin[] memory result = new Admin[](adminKeys.length);
 
-        uint256 index = 0;
         for (uint256 i = 0; i < adminKeys.length; i++) {
             if (admins[adminKeys[i]].isAdmin) {
-                result[index] = admins[adminKeys[i]];
-                index++;
+                result[i] = admins[adminKeys[i]];
             }
         }
 
         return result;
+    }
+
+    // get all admin stats
+    function getAdminStats()
+        public
+        view
+        returns (uint256, uint256, uint256, uint256)
+    {
+        uint256 adminTotalCompanies = companiesCounter;
+        uint256 adminTotalReceipts = receiptCounter;
+        uint256 adminTotalAdmins = adminKeys.length;
+        uint256 adminTotalSales = totalSales;
+
+        return (
+            adminTotalCompanies,
+            adminTotalReceipts,
+            adminTotalAdmins,
+            adminTotalSales
+        );
     }
 
     // --- HELPERS ---

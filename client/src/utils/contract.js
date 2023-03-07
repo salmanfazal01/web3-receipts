@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { isAddressNull } from "./helper";
 
 // Company
 export const registerCompany = async (contract, _name, _address) => {
@@ -46,11 +46,10 @@ export const getCompany = async (contract, _id, callback) => {
       companyAddress: result.companyAddress,
       approved: result.approved,
       approvedBy: result.approvedBy,
-      approvalDate: result.approvalDate,
-      totalSales: result.totalSales,
-      notCreated:
-        result.owner === "0x0000000000000000000000000000000000000000" ||
-        !result.owner,
+      approvalDate: result.approvalDate.toNumber?.(),
+      totalSales: result.totalSales?.toNumber?.(),
+      notCreated: isAddressNull(result.owner) || !result.owner,
+      receiptIds: result.receiptIds.map((i) => i.toNumber?.()),
     };
 
     console.log("getCompany", obj);
@@ -87,11 +86,11 @@ export const getReceipt = async (contract, _id) => {
   const obj = {};
   obj.companyId = result[0].company;
   obj.companyName = result.companyName;
-  obj.date = parseInt(result[0].saleDate);
+  obj.date = result[0].saleDate?.toNumber?.() || 0;
   obj.sales = result[0].itemNames.map((_item, i) => ({
     name: _item,
-    price: parseFloat(result[0].itemPrices[i]),
-    quantity: parseInt(result[0].itemQuantities[i]),
+    price: result[0].itemPrices[i]?.toNumber?.() || 0,
+    quantity: result[0].itemQuantities[i]?.toNumber?.() || 0,
   }));
 
   console.log("getReceipt", obj);
@@ -102,9 +101,35 @@ export const getReceipt = async (contract, _id) => {
 // Sales
 export const getTotalSales = async (contract, _companyId) => {
   const _result = await contract.call("getTotalSales", _companyId);
-  const result = parseFloat(_result);
+  const result = _result?.toNumber?.() || 0;
   console.log("getTotalSales", result);
   return result;
+};
+
+export const getCompanyReceipts = async (contract, _id, callback) => {
+  try {
+    const _result = await contract.call("getCompanyReceipts", _id);
+
+    const result = _result.map((sale) => ({
+      companyId: sale.company,
+      saleDate: sale.saleDate?.toNumber?.() || 0,
+      total: sale.saleTotal?.toNumber?.() || 0,
+      items: sale.itemNames?.map?.((_, i) => ({
+        name: sale.itemNames[i],
+        price: sale.itemPrices[i]?.toNumber?.() || 0,
+        quantity: sale.itemQuantities[i]?.toNumber?.() || 0,
+      })),
+    }));
+
+    console.log("getCompanyReceipts", result);
+
+    callback?.(result);
+
+    return result;
+  } catch (error) {
+    console.log("Error in getCompanyReceipts:", error);
+    throw error;
+  }
 };
 
 // Admin
@@ -123,6 +148,26 @@ export const getAdmins = async (contract, callback) => {
     return result;
   } catch (error) {
     console.log("Error in getAdmins:", error);
+    return error;
+  }
+};
+
+export const getAdminStats = async (contract, callback) => {
+  try {
+    const _result = await contract.call("getAdminStats");
+
+    const obj = {
+      totalCompanies: _result[0]?.toNumber?.() || 0,
+      totalReceipts: _result[1]?.toNumber?.() || 0,
+      totalAdmins: _result[2]?.toNumber?.() || 0,
+      totalSales: _result[3]?.toNumber?.() || 0,
+    };
+
+    callback?.(obj || {});
+
+    return obj;
+  } catch (error) {
+    console.log("Error in getAdminStats:", error);
     return error;
   }
 };

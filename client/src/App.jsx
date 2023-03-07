@@ -5,7 +5,6 @@ import Sidebar from "./components/Sidebar";
 import ProfileSegment from "./page-components/ProfileSegment";
 import Admins from "./pages/Admins";
 import Company from "./pages/Company";
-import Home from "./pages/Home";
 
 const App = () => {
   return (
@@ -13,18 +12,17 @@ const App = () => {
       <Sidebar />
 
       <Box
-        sx={(theme) => ({
+        sx={{
           flex: 1,
           py: 3,
           px: 2,
           mr: { lg: "300px", xl: "400px" },
           // width: `calc(100% - 400px)`,
-        })}
+        }}
       >
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Company />} />
           <Route path="/admins" element={<Admins />} />
-          <Route path="/company" element={<Company />} />
         </Routes>
       </Box>
 

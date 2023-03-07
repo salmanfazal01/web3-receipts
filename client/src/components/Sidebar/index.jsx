@@ -2,7 +2,6 @@ import BusinessIcon from "@mui/icons-material/Business";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
-import ReceiptIcon from "@mui/icons-material/Receipt";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import {
   Box,
@@ -17,14 +16,13 @@ import {
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useStateContext } from "../../context";
+import { smallerString } from "../../utils/helper";
 
 export const drawerWidth = 140;
 
 const SIDEBAR_ITEMS = [
   { name: "Home", Icon: DashboardIcon, link: "/" },
   { name: "Admins", Icon: SupervisorAccountIcon, link: "/admins" },
-  { name: "Company", Icon: BusinessIcon, link: "/company" },
-  { name: "Receipts", Icon: ReceiptIcon, link: "/receipts" },
 ];
 
 const Sidebar = () => {
@@ -84,17 +82,23 @@ const Sidebar = () => {
       </Stack>
 
       {!address ? (
-        <Tooltip title="Connect Wallet" placement="right">
+        <>
           <IconButton onClick={connect}>
             <LoginIcon sx={{ color: "primary.inverse", fontSize: 26 }} />
           </IconButton>
-        </Tooltip>
+          <Typography variant="caption">Connect</Typography>
+        </>
       ) : (
-        <Tooltip title="Disconnect Wallet" placement="right">
+        <>
           <IconButton onClick={disconnect}>
             <LogoutIcon sx={{ color: "primary.inverse", fontSize: 26 }} />
           </IconButton>
-        </Tooltip>
+          <Typography variant="caption">
+            Disconnect
+            <br />
+            {smallerString(address, 3, -4)}
+          </Typography>
+        </>
       )}
     </Box>
   );

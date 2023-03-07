@@ -1,25 +1,34 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   useAddress,
   useContract,
-  useContractMetadata,
-  useContractRead,
-  useContractWrite,
   useDisconnect,
   useMetamask,
 } from "@thirdweb-dev/react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import LoadingPopup from "../components/LoadingPopup";
-import { getAdmins, getCompany } from "../utils/contract";
+import {
+  getAdmins,
+  getAdminStats,
+  getCompany,
+  getCompanyReceipts,
+} from "../utils/contract";
 const StateContext = createContext();
 
 export const StateContextProvider = ({ children }) => {
   const { contract, isLoading } = useContract(
-    "0x082a551d9ac1f3af27227dafbD7FC540A8F25Ccc"
+    "0x37a425E4A37aD63c5Ca36b0b6AAd6f633454C198"
   );
 
+  const [receipts, setReceipts] = useState([]);
   const [company, setCompany] = useState({});
   const [admins, setAdmins] = useState([]);
+  const [adminStats, setAdminStats] = useState({
+    totalCompanies: 0,
+    totalReceipts: 0,
+    totalAdmins: 0,
+    totalSales: 0,
+  });
   const [loadingPopup, setLoadingPopup] = useState(null);
 
   const address = useAddress();
@@ -30,13 +39,16 @@ export const StateContextProvider = ({ children }) => {
 
   useEffect(() => {
     !isLoading && admins.length == 0 && getAdmins(contract, setAdmins);
+    !isLoading && getAdminStats(contract, setAdminStats);
   }, [isLoading]);
 
   useEffect(() => {
     if (!address && !isLoading) {
       setCompany({});
+      setReceipts([]);
     } else if (!isLoading && !company.companyId && address) {
       getCompany(contract, address, setCompany);
+      getCompanyReceipts(contract, address, setReceipts);
     }
   }, [isLoading, address]);
 
@@ -59,9 +71,13 @@ export const StateContextProvider = ({ children }) => {
         contract,
         admins,
         setAdmins,
+        adminStats,
+        setAdminStats,
         setLoadingPopup,
         company,
         setCompany,
+        receipts,
+        setReceipts,
       }}
     >
       {children}

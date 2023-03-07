@@ -20,7 +20,7 @@ const NewCompanyForm = ({ handleClose }) => {
 
     setLoadingPopup({
       title: "Sign transaction",
-      message: "Please, sign transaction in your wallet",
+      message: "Please sign transaction in your wallet",
     });
     setLoading(true);
 

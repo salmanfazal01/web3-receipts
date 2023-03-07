@@ -8,14 +8,14 @@ import { useStateContext } from "../context";
 import { getAdmins, removeAdmin } from "../utils/contract";
 import { smallerString } from "../utils/helper";
 
-const AllAdmins = () => {
+const AllAdmins = ({ setFormDrawerOpen }) => {
   const { contract, admins, setAdmins, address, setLoadingPopup } =
     useStateContext();
 
   const handleRemoveAdmin = async (id) => {
     setLoadingPopup({
       title: "Sign transaction",
-      message: "Please, sign transaction in your wallet",
+      message: "Please sign transaction in your wallet",
     });
 
     await removeAdmin(contract, id)

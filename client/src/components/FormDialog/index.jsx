@@ -1,7 +1,7 @@
 import { Dialog, Typography } from "@mui/material";
 import React from "react";
 
-const FormDialog = ({ open, handleClose, title, children }) => {
+const FormDialog = ({ open, handleClose, title, children, ...props }) => {
   return (
     <Dialog
       onClose={handleClose}
@@ -11,7 +11,6 @@ const FormDialog = ({ open, handleClose, title, children }) => {
         sx: {
           borderRadius: 5,
           p: 2,
-          width: 420,
           bgcolor: "background.primary",
         },
       }}
@@ -23,6 +22,7 @@ const FormDialog = ({ open, handleClose, title, children }) => {
           },
         },
       }}
+      {...props}
     >
       {title && (
         <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
