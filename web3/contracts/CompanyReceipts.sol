@@ -190,8 +190,8 @@ contract CompanyReceipts {
     // Function for a company to issue a receipt
     function issueReceipt(
         string[] memory _names,
-        fixed256x18[] memory _prices,
-        fixed256x18[] memory _quantities
+        uint256[] memory _prices,
+        uint256[] memory _quantities
     ) public returns (Receipt memory, string memory companyName) {
         Company storage company = companies[msg.sender];
 

@@ -24,8 +24,6 @@ const Company = () => {
     setReceiptFormOpen(false);
   };
 
-  console.log(company);
-
   return (
     <Box sx={{ height: "100%" }}>
       <Stack
