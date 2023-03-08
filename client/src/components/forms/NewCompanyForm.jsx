@@ -41,7 +41,7 @@ const NewCompanyForm = ({ handleClose }) => {
         handleClose();
         enqueueSnackbar(err.message, {
           variant: "error",
-          autoHideDuration: 3000,
+          autoHideDuration: 5000,
         });
       });
   };

@@ -32,7 +32,7 @@ const AllAdmins = ({ setFormDrawerOpen }) => {
         console.log(err);
         enqueueSnackbar(err.message, {
           variant: "error",
-          autoHideDuration: 3000,
+          autoHideDuration: 5000,
         });
       });
   };

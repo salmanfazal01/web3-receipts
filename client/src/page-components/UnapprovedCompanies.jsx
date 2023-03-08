@@ -54,7 +54,7 @@ const UnapprovedCompanies = () => {
         console.log(error);
         enqueueSnackbar(error.message, {
           variant: "error",
-          autoHideDuration: 3000,
+          autoHideDuration: 5000,
         });
       });
   };
