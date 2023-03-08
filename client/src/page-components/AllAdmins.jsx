@@ -30,11 +30,11 @@ const AllAdmins = ({ setFormDrawerOpen }) => {
       .catch((err) => {
         setLoadingPopup(null);
         console.log(err);
+        enqueueSnackbar(err.message, {
+          variant: "error",
+          autoHideDuration: 3000,
+        });
       });
-    enqueueSnackbar(err.message, {
-      variant: "error",
-      autoHideDuration: 3000,
-    });
   };
 
   return (
