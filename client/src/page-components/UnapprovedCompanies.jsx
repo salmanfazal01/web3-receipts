@@ -10,6 +10,7 @@ import {
 } from "../utils/contract";
 import { useStateContext } from "../context";
 import { smallerString } from "../utils/helper";
+import { useSnackbar } from "notistack";
 
 const UnapprovedCompanies = () => {
   const {
@@ -22,6 +23,7 @@ const UnapprovedCompanies = () => {
   } = useStateContext();
 
   const [companies, setCompanies] = useState([]);
+  const { enqueueSnackbar } = useSnackbar();
 
   const _get = async () => {
     const result = await getUnapprovedCompanies(contract);
@@ -47,9 +49,13 @@ const UnapprovedCompanies = () => {
       .then(() => {
         setLoadingPopup(null);
       })
-      .catch((err) => {
+      .catch((error) => {
         setLoadingPopup(null);
-        console.log(err);
+        console.log(error);
+        enqueueSnackbar(error.message, {
+          variant: "error",
+          autoHideDuration: 3000,
+        });
       });
   };
 

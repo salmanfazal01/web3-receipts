@@ -5,6 +5,7 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import { useSnackbar } from "notistack";
 import React, { useState } from "react";
 import { useStateContext } from "../../context";
 import { getAdmins, getAdminStats } from "../../utils/contract";
@@ -15,6 +16,7 @@ const NewAdminForm = ({ handleClose }) => {
   const [superAdmin, setSuperAdmin] = useState(false);
   const { contract, setLoadingPopup, setAdmins, setAdminStats } =
     useStateContext();
+    const { enqueueSnackbar } = useSnackbar();
 
   const submitForm = async (e) => {
     e.preventDefault();
@@ -37,6 +39,10 @@ const NewAdminForm = ({ handleClose }) => {
         setLoadingPopup(null);
         console.log(err);
         handleClose();
+        enqueueSnackbar(err.message, {
+          variant: "error",
+          autoHideDuration: 3000,
+        });
       });
   };
 

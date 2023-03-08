@@ -7,6 +7,7 @@ import { StateContextProvider } from "./context";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import theme from "./utils/theme";
 import "./styles/globals.css";
+import { SnackbarProvider } from "notistack";
 
 // This is the chain your dApp will work on.
 // Change this to the chain your app is built for.
@@ -20,12 +21,14 @@ root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <ThirdwebProvider activeChain={activeChainId}>
-        <Router>
-          <StateContextProvider>
-            <CssBaseline />
-            <App />
-          </StateContextProvider>
-        </Router>
+        <SnackbarProvider maxSnack={3}>
+          <Router>
+            <StateContextProvider>
+              <CssBaseline />
+              <App />
+            </StateContextProvider>
+          </Router>
+        </SnackbarProvider>
       </ThirdwebProvider>
     </ThemeProvider>
   </React.StrictMode>

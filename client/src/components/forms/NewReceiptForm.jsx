@@ -1,4 +1,5 @@
 import { Box, Button, Grid, Stack, TextField, Typography } from "@mui/material";
+import { useSnackbar } from "notistack";
 import React, { useState } from "react";
 import { useStateContext } from "../../context";
 import {
@@ -20,6 +21,7 @@ const NewReceiptForm = ({ handleClose }) => {
     company,
     setCompany,
   } = useStateContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const submitForm = async (e) => {
     e.preventDefault();
@@ -47,6 +49,10 @@ const NewReceiptForm = ({ handleClose }) => {
         setLoadingPopup(null);
         console.log(err);
         handleClose();
+        enqueueSnackbar(err.message, {
+          variant: "error",
+          autoHideDuration: 3000,
+        });
       });
   };
 

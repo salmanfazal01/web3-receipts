@@ -5,6 +5,7 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import { useSnackbar } from "notistack";
 import React, { useState } from "react";
 import { useStateContext } from "../../context";
 import { getAdmins, getCompany, registerCompany } from "../../utils/contract";
@@ -14,6 +15,8 @@ const NewCompanyForm = ({ handleClose }) => {
   const [companyName, setCompanyName] = useState("");
   const [companyAddress, setCompanyAddress] = useState("");
   const { contract, address, setLoadingPopup, setCompany } = useStateContext();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const submitForm = async (e) => {
     e.preventDefault();
@@ -36,6 +39,10 @@ const NewCompanyForm = ({ handleClose }) => {
         setLoadingPopup(null);
         console.log(err);
         handleClose();
+        enqueueSnackbar(err.message, {
+          variant: "error",
+          autoHideDuration: 3000,
+        });
       });
   };
 

@@ -1,6 +1,7 @@
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { useSnackbar } from "notistack";
 import React from "react";
 import CustomPaper from "../components/CustomPaper";
 import Title from "../components/Title";
@@ -11,6 +12,7 @@ import { smallerString } from "../utils/helper";
 const AllAdmins = ({ setFormDrawerOpen }) => {
   const { contract, admins, setAdmins, address, setLoadingPopup } =
     useStateContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleRemoveAdmin = async (id) => {
     setLoadingPopup({
@@ -29,6 +31,10 @@ const AllAdmins = ({ setFormDrawerOpen }) => {
         setLoadingPopup(null);
         console.log(err);
       });
+    enqueueSnackbar(err.message, {
+      variant: "error",
+      autoHideDuration: 3000,
+    });
   };
 
   return (
