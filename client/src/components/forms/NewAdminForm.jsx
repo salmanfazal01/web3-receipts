@@ -8,7 +8,7 @@ import {
 import { useSnackbar } from "notistack";
 import React, { useState } from "react";
 import { useStateContext } from "../../context";
-import { getAdmins, getAdminStats } from "../../utils/contract";
+import { addAdmin, getAdmins, getAdminStats } from "../../utils/contract";
 
 const NewAdminForm = ({ handleClose }) => {
   const [loading, setLoading] = useState(false);

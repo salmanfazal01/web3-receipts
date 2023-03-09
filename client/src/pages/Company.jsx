@@ -19,6 +19,8 @@ const Company = () => {
   const [registerFormOpen, setRegisterFormOpen] = useState(false);
   const [receiptFormOpen, setReceiptFormOpen] = useState(false);
 
+  console.log(company);
+
   const closeFormDrawer = () => {
     setRegisterFormOpen(false);
     setReceiptFormOpen(false);
@@ -37,7 +39,7 @@ const Company = () => {
             {company.companyName || "Your company"}
           </Title>
 
-          {company.companyId && (
+          {company.companyId && !isAddressNull(company.companyId) && (
             <Typography variant="body2" sx={{ overflowWrap: "break-word" }}>
               ID: {company.companyId}
             </Typography>
